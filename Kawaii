@@ -1,0 +1,516 @@
+import ddf.minim.*;
+Minim cadena;
+AudioPlayer cancion;
+
+Mounstro Dona;
+Mounstro Galleta;
+Mounstro Paleta;
+Mounstro Panda;
+Mounstro Rana;
+int IDpersonaje = 0;
+int IDpersonaje1 = -1;
+int IDpersonaje2 = -1;
+int cx = 0;
+int cy = 0;
+int PJ1x = 10;
+int PJ1y = 250;
+int PJ2x = 800;
+int PJ2y = 0;
+int xataque=0;
+int yataque = 50;
+int xvida = 590;
+int yvida = 10;
+int pantalla = 0;
+int numero = 1;
+int turno = 1;
+String Elemento[] = {"fuego","agua","aire","tierra"};
+float a=100;
+float x = 0;
+float h = 0;
+float i = 0;
+PImage b;
+PImage d;
+PImage e;
+
+
+//Nombre, vida, ataque, defensa, elemento, dibujo
+ void setup()
+ {
+  Dona = new Mounstro("Dona", 100, 10, 15, 3, 0);
+  Galleta = new Mounstro("Galleta", 100, 17, 20, 0, 1);
+  Paleta = new Mounstro("Paleta", 100, 12, 22, 2, 2);
+  Panda = new Mounstro("Panda", 100, 20, 15, 3, 3);
+  Rana = new Mounstro("Rana", 100, 19, 20, 1, 4);
+  
+  cadena = new Minim(this);cancion = cadena.loadFile("Wolf Blood.mp3");
+  
+  size(1100,500);
+  background(185);
+  
+  b = loadImage("Paisaje7.jpg");
+  d = loadImage("Paisaje3.jpg");
+  e = loadImage("Paisaje2.jpg");
+}
+
+void draw()
+{
+  if(pantalla == 0)
+    {
+      if(key==0)
+      {
+        image(e,0,0,1100,500);
+        textSize(90); 
+        fill(210, 70, 100);
+        text("KAWAII GAME", 250, 200);
+        textSize(40); 
+        fill(180, 70, 153);
+        text("Presione Tecla 1", 300, 300);
+        inicio();
+      }
+      else
+      {
+        key=0;
+        pantalla=1;
+      }
+    }
+    if(pantalla==1)
+    {
+      background(150,200,150);
+      image(d,0,0,1100,500);
+      fill(random(100),95,140);
+      noStroke();
+      ellipse(random(1100),random(350), random(100), random(100)); 
+      fill(255,200,230);
+      ellipse (random (1100), random(300), random (100), random (100));
+      fill(255,200,230);
+      ellipse (550, random(300), random (50), random (50));
+      fill(110,250,165);
+      rect(cx,cy,200,200);
+      
+      
+      textSize(20); 
+      fill(0, 102, 153);
+      text("Seleccione Personaje Dezlizandote Con A y D \nSeleccionando con ENTER\nAtaques con letras Z,X,C", 300, 300);
+      Dona.Dibujar(0,0,0,0);
+      Galleta.Dibujar(1, 200,0,0);
+      Paleta.Dibujar(2, 200, -30,0);
+      Panda.Dibujar(3, 200, 20, 0);
+      Rana.Dibujar(4, 150, -30, 0);
+      if(IDpersonaje1==-1)
+      {
+        text("Jugador 1", -300, 450);
+      }
+      if(IDpersonaje2==-2)
+      {
+        text("Jugador 2", -400, 450);
+      }
+    }
+    if(pantalla==2)
+    {
+      background(150,100,130);
+      image(b,0,0,1100,500);
+      fill(255,200,255);
+      ellipse(random(1100),random(200),random(20),random(20));
+      fill(250,240,240);
+      ellipse(random(1100),random(200),random(15),random(15));
+      fill(110,250,165);
+      Dona.Dibujarvida();
+      Galleta.Dibujarvida();
+      Dona.Dibujar(IDpersonaje1,PJ1x,PJ1y,1); //personaje,posicion en x, posicion en y, jugador
+      Galleta.Dibujar(IDpersonaje2,PJ2x,PJ2y,2);
+      if(Galleta.vida>0 && Dona.vida>0)
+      {
+        if(key=='z')
+        {
+          if(turno==1) Dona.ataque1();
+          if(turno==2) Galleta.ataque1();
+        }
+        if(key=='x')
+        {
+          if(turno==1) Dona.ataque2();
+          if(turno==2) Galleta.ataque2();
+        }
+        if(key=='c')
+        {
+          if(turno==1) Dona.ataque3();
+          if(turno==2) Galleta.ataque3();
+        }
+      }
+      if(Dona.vida<=0)
+      {
+        textSize(32); 
+        fill(0, 102, 153);
+        text("Game Over \nWin Player 2 \nPara volver a jugar presione R", -250, -100);
+      }
+      if(Galleta.vida<=0)
+      {
+        textSize(32); 
+        fill(0, 102, 153);
+        text("Game Over \nWin Player 1 \nPara volver a jugar presione R", -250, -100);
+      }
+    }
+}
+
+class Mounstro 
+{
+  String nombre;
+  int vida;
+  int ataque;
+  int defensa;
+  int elemento;
+  int dibujo;
+  int Jugador;
+  
+  Mounstro(String nombre_, int vida_, int ataque_,int defensa_, int elemento_, int dibujo_)
+  {
+    nombre = nombre_;
+    vida = vida_;
+    ataque = ataque_;
+    defensa = defensa_;
+    elemento = elemento_;
+    dibujo = dibujo_;
+  }
+
+void Dibujar(int dibujo_,int x,int y, int jugador)
+{
+  Jugador=jugador;
+  translate(x,y);
+ switch(dibujo_)
+ {
+   case 0: // Dona
+     //translate(x,y);
+     fill(239,169,74); 
+     noStroke(); 
+     ellipse(100,100,150,150); 
+     fill(255); 
+     stroke(243,159,24); 
+     ellipse(100,100,75,75);
+     fill(0);
+     noStroke(); 
+     ellipse(140,55,25,35); 
+     ellipse(60,55,25,35); 
+     fill(255); 
+     ellipse(65,55,10,10); 
+     ellipse(135,55,10,10); 
+     ellipse(60,50,5,5); 
+     ellipse(140,50,5,5);
+     fill(230,50,68); 
+     noStroke(); 
+     ellipse(50,80,35,15); 
+     ellipse(150,80,35,15);
+   break;
+   
+   case 1: //Galleta
+   //translate(200,0);
+    fill(239,169,74); 
+    noStroke(); 
+    ellipse(100,100, 150,150);
+    fill(91,58,41); 
+    noStroke(); 
+    ellipse (105,105,10,10); 
+    ellipse(130,80,15,14); 
+    ellipse(95,70,15,15); 
+    ellipse(115,105,10,14); 
+    ellipse(80,100,10,10); 
+    ellipse(105,145,15,13); 
+    ellipse(80,100,14,13); 
+    ellipse(50,135,13,15); 
+    ellipse(120,50,10,12); 
+    ellipse(45,69,15,13); 
+    ellipse(50,95,13,13); 
+    ellipse(155,110,13,16); 
+    ellipse(90,160,14,14); 
+    ellipse(90,50,10,12);
+    fill(203,46,33); 
+    noStroke(); 
+    ellipse(50,120,30,20); 
+    ellipse(150,120,30,20);
+    fill(0); 
+    ellipse(70,100,25,40); 
+    ellipse(130,100,25,40); 
+    fill(255); 
+    ellipse(75,90,10,10); 
+    ellipse(135,90,10,10);
+   break;
+   
+   case 2: //Paleta
+    //translate(200,-30);
+    fill(234,137,154); 
+    noStroke(); 
+    ellipse(100,100,100,100);  
+    fill(202,196,176); 
+    noStroke(); 
+    rect(90,150,20,70);
+    fill(222,76,138); 
+    ellipse(60,120,30,15); 
+    ellipse(140,120,30,15);
+    fill(0); 
+    noStroke(); 
+    ellipse(75,90,20,35); 
+    ellipse(125,90,20,35);
+    ellipse(100,120,11,25); 
+    fill(255); 
+    ellipse(75,80,10,10); 
+    ellipse(125,80,10,10);
+   break;
+   
+   case 3: //Panda
+    //translate(200,20);
+    fill(0); 
+    ellipse(60,55,70,50); 
+    ellipse(140,55,70,50);
+    fill(255); 
+    stroke(0);
+    ellipse(100,100,150,100);
+    fill(0); 
+    ellipse(70,95,30,40); 
+    ellipse(130,95,30,40);
+    fill(255); 
+    ellipse(70,95,10,10); 
+    ellipse(130,95,10,10);  
+    fill(0); 
+    ellipse(100,120,30,20);
+    fill(0); 
+    ellipse(60,150,80,30); 
+    ellipse(140,150,80,30);
+    fill(0,150,0); 
+    rect(95,135,10,60); 
+    noStroke(); 
+    fill(0,150,0); 
+    ellipse(110,150,15,5);
+   break;
+   
+   case 4: // Rana   
+    //translate(150,-30);
+    fill(36,231,17); 
+    stroke(0); 
+    ellipse(150,150,175,125);
+    fill(255); 
+    stroke(0); 
+    ellipse(110,100,80,80); 
+    ellipse(190,100,80,80); 
+    fill(0); 
+    ellipse(170,100,20,20); 
+    ellipse(130,100,20,20);
+    fill(245,64,33); 
+    noStroke(); 
+    ellipse(90,150,60,30); 
+    ellipse(210,150,60,30);
+    fill(114,20,34); 
+    ellipse(150,180,15,30);
+   break;
+    }//switch
+  }//Dibujar
+  
+  void Dibujarvida()
+  {
+    int ps=vida;//ps=puntos de salud
+    if(Jugador==1)
+    {
+      fill(0,255,0);
+      rect(10,10,ps*5,50);
+    }
+    if(Jugador==2)
+    {
+      fill(0,255,0);
+      rect(xvida,yvida,ps*5,50);
+    }
+  }
+  
+  void ataque1()
+  {
+    int y=(int)random(110);
+    int r=(int)random(100);
+    int danio=12;        
+    int critico = (int)random(100);
+    if(critico>=0 && critico<=30) danio=(int)(1.5*danio);
+    //______________________________________ataque 1 jugador 1
+    if(Jugador==1)
+    {
+      fill(random(255),50,100);
+      ellipse(xataque-700, 50, r, r);
+      xataque = xataque+5;
+      if(xataque==800)
+      {
+        xvida=xvida+ danio*5;
+        Galleta.vida=Galleta.vida-danio;
+        xataque = 0;
+        turno=2;
+        key = 0;
+      }
+    }
+    //______________________________________ataque 1 jugador 2
+    if(Jugador==2)
+    {
+      fill(random(255),50,100);
+      ellipse(xataque, 50, r, r);
+      xataque = xataque-5;
+      if(xataque==-700)
+      {
+        key = 0;
+        turno=1;
+        Dona.vida=Dona.vida-danio;
+        xataque = 0;
+      }
+    }
+  }
+  void ataque2()
+  {
+    int danio=16;        
+    int critico = (int)random(100);
+    if(critico>=0 && critico<=20) danio=(int)(1.5*danio);
+    fill(255, random(50),50);
+    int y1,y2,y3;
+    y1=(int)random(25);
+    y2=(int)random(25);
+    y3=(int)random(25);
+    //___________________________ ataque 2 jugador 1
+    if(Jugador==1)
+    {
+      triangle(xataque-700,50+y1,xataque -750,50+y2,xataque-600,50+y3);
+      //triangle(-700,50,-800,60,-750,70);
+      xataque = xataque + 5;
+      if(xataque==750)
+      {
+        xvida=xvida + danio*5;
+        key=0;
+        turno=2;
+        Galleta.vida=Galleta.vida - danio;
+        xataque = 0;
+      }
+    }
+    //______________ataque 2 jugador 2
+    if(Jugador==2)
+    {
+      triangle(xataque,50-y1,xataque-50,50-y2,xataque+30,50-y3);
+      //triangle(0,50,10,60,50,70);
+      xataque = xataque - 5;
+      if(xataque==-700)
+      {
+        key=0;
+        turno=1;
+        Dona.vida=Dona.vida-danio;
+        xataque = 0;
+      }
+    }
+  }
+  void ataque3()
+  {
+    int y=(int)random(30);
+    int r=(int)random(30);
+    
+    int danio=20;        
+    int critico = (int)random(100);
+    if(critico>=0 && critico<=10) danio=(int)(1.5*danio);
+    //Ataque 3 jugador 1
+    if(Jugador==1)
+    {
+      fill(50,100,random(100));
+      ellipse(xataque-700, 50+y, r+60, r);
+      xataque = xataque+5;
+      if(xataque==800)
+      {
+        key=0;
+        turno=2;
+        xvida=xvida+danio*5;
+        Galleta.vida=Galleta.vida-danio;
+        xataque = 0;
+      }
+    }
+    //Ataque 3 Jugador 2
+    if(Jugador==2)
+    {
+      fill(50,100,random(255));
+      ellipse(xataque, 50-y, r+60, r);
+      xataque = xataque-5;
+      if(xataque==-700)
+      { 
+        key=0;
+        turno=1;
+        Dona.vida=Dona.vida-danio;
+        xataque = 0;
+      }
+    }
+    
+  }
+}//Clase
+
+
+void inicio()
+{
+  fill(155,95,240);
+  noStroke();
+  ellipse(random(1100),random(500), random(15), random(15));
+  ellipse(random(1100),random(500), random(30), random(30));
+  
+}
+
+
+void keyPressed()
+{
+   if(key=='1')
+  {
+    cancion.play();
+  }
+  if(key=='r')
+  {
+    cancion.pause();
+    cancion.rewind();
+  }
+  if(pantalla==1)
+  {
+    if(IDpersonaje >=0 && IDpersonaje<=4) // && es "y" se deben cumplir las dos opciones mientras || significa "o" que solo alguna de las opciones debe de cumplirse
+    {
+      if(key=='d')
+      {
+        if(IDpersonaje==4) return;
+        cx=cx+200;
+        IDpersonaje = IDpersonaje+1;
+        key=0;
+      }
+      if(key=='a')
+      {
+        if(IDpersonaje==0) return;
+        cx=cx-200;
+        IDpersonaje = IDpersonaje-1;
+        key=0;
+      }
+      if(IDpersonaje1==-1)
+      {
+        if(key=='\n')
+        {
+          IDpersonaje1 = IDpersonaje;
+          IDpersonaje2 = -2;
+          IDpersonaje = 0;
+          cx = 0;
+          cy = 0;
+          key = 0;          
+        }
+      }
+      if(IDpersonaje2==-2)
+      {       
+        if(key=='\n')
+        {
+          IDpersonaje2 = IDpersonaje;
+          IDpersonaje = 0;
+          cx = 0;
+          cy = 0;
+          key = 0;  
+          pantalla = 2;
+        }
+      }
+
+    }
+  }
+  if(pantalla==2)
+  {
+    if(Galleta.vida<=0 || Dona.vida<=0)
+    {
+      if(key=='r')
+      {
+        pantalla=0;
+        
+      }
+    }
+  }
+}
